@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDF Highlight Reader</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: rgba(255, 255, 255, 0.96);
+      --accent: #0ea5e9;
+      --accent-2: #f97316;
+      --muted: #6b7280;
+      --border: rgba(15, 23, 42, 0.08);
+      --radius: 14px;
+      --shadow: 0 15px 40px rgba(15, 23, 42, 0.25);
+      --font: "Space Grotesk", "Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      width: 360px;
+      min-height: 460px;
+      font-family: var(--font);
+      color: #0b1021;
+      background: radial-gradient(140% 120% at 10% 10%, rgba(14, 165, 233, 0.25) 0%, rgba(14, 165, 233, 0) 60%),
+                  radial-gradient(120% 140% at 90% 20%, rgba(249, 115, 22, 0.22) 0%, rgba(249, 115, 22, 0) 50%),
+                  #e2e8f0;
+    }
+
+    .card {
+      position: relative;
+      background: var(--panel);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.08), rgba(249, 115, 22, 0.08));
+      pointer-events: none;
+    }
+
+    .card > * { position: relative; z-index: 1; }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      box-shadow: 0 10px 25px rgba(14, 165, 233, 0.35);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: -0.3px;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 12px 0;
+    }
+
+    .control {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      font-size: 12px;
+      color: #0f172a;
+      margin-bottom: 6px;
+      letter-spacing: -0.2px;
+    }
+
+    select, input[type="range"], textarea, button {
+      font-family: var(--font);
+    }
+
+    select {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #fff;
+      font-size: 13px;
+      color: #0f172a;
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      border-radius: 12px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      background: #fff;
+      font-size: 13px;
+      resize: vertical;
+      color: #0f172a;
+    }
+
+    textarea::placeholder {
+      color: #94a3b8;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr 0.9fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    button {
+      border: none;
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent), #2563eb);
+      cursor: pointer;
+      transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.25);
+    }
+
+    button.secondary {
+      background: #0f172a;
+      color: #e2e8f0;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.25);
+    }
+
+    button.accent {
+      background: linear-gradient(135deg, var(--accent-2), #e11d48);
+      box-shadow: 0 12px 30px rgba(249, 115, 22, 0.28);
+    }
+
+    button:hover { transform: translateY(-1px); filter: brightness(1.02); }
+    button:active { transform: translateY(0); }
+
+    .status {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #0f172a;
+      background: #ecfeff;
+      border: 1px solid rgba(14, 165, 233, 0.35);
+      padding: 8px 10px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status.hidden { display: none; }
+
+    .smallprint {
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <header>
+      <div class="brand">
+        <div class="icon">TTS</div>
+        <div>
+          <h1>Highlight Reader</h1>
+          <p class="subtitle">Read any selected PDF text aloud.</p>
+        </div>
+      </div>
+    </header>
+
+    <div class="controls-grid">
+      <div class="control">
+        <label for="voiceSelect">Voice</label>
+        <select id="voiceSelect"></select>
+      </div>
+      <div class="control">
+        <div class="slider-row"><span>Speed</span><span id="rateValue">1.0x</span></div>
+        <input id="rate" type="range" min="0.6" max="1.8" step="0.1" value="1" />
+      </div>
+      <div class="control">
+        <div class="slider-row"><span>Pitch</span><span id="pitchValue">1.0</span></div>
+        <input id="pitch" type="range" min="0.6" max="1.6" step="0.1" value="1" />
+      </div>
+      <div class="control">
+        <div class="slider-row"><span>Volume</span><span id="volumeValue">1.0</span></div>
+        <input id="volume" type="range" min="0.2" max="1" step="0.05" value="1" />
+      </div>
+    </div>
+
+    <textarea id="customText" placeholder="Type or paste text to hear it. Your selection on the page will still work instantly." aria-label="Custom text"></textarea>
+
+    <div class="buttons">
+      <button id="readSelection">Read selection</button>
+      <button class="secondary" id="readCustom">Read this text</button>
+      <button class="accent" id="stop">Stop</button>
+    </div>
+
+    <div id="status" class="status hidden"></div>
+
+    <div class="smallprint">Tip: highlight text on a PDF, then click "Read selection" or press the shortcut.</div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

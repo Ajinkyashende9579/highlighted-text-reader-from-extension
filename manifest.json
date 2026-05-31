@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "PDF Highlight Reader",
+  "version": "1.0",
+  "description": "Select text on any page (including PDFs) and right-click or press a shortcut to have it read aloud using Text-to-Speech.",
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "PDF Highlight Reader"
+  },
+  "permissions": [
+    "contextMenus",
+    "tts",
+    "scripting",
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "commands": {
+    "read-highlighted-text": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+9",
+        "mac": "Command+Shift+S"
+      },
+      "description": "Read the currently highlighted text aloud."
+    }
+  }
+}
